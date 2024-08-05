@@ -39,6 +39,26 @@ export default function Home() {
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const updateInventory = async () => {
+        const snapshot = query(collection(firestore, "inventory"));
+        const docs = await getDocs(snapshot);
+        const inventoryList = [];
+        docs.forEach((doc) => {
+          inventoryList.push({
+            name: doc.id,
+            ...doc.data(),
+          });
+        });
+        setInventory(inventoryList);
+        setFilteredInventory(inventoryList);
+      };
+
+      updateInventory();
+    }
+  }, []);
+
   const handleSubmit = async () => {
     setLoading(true);
 
@@ -119,10 +139,6 @@ export default function Home() {
 
     await updateInventory();
   };
-
-  useEffect(() => {
-    updateInventory();
-  }, []);
 
   useEffect(() => {
     filterInventory(search);
